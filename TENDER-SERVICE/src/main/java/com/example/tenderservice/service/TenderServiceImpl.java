@@ -1,6 +1,7 @@
 package com.example.tenderservice.service;
 
 import com.example.tenderservice.dto.*;
+import com.example.tenderservice.entity.EvaluationCriterion;
 import com.example.tenderservice.entity.Tender;
 import com.example.tenderservice.entity.TenderDocumentRef;
 import com.example.tenderservice.entity.enumeration.TenderStatus;
@@ -9,8 +10,10 @@ import com.example.tenderservice.mapper.TenderMapper;
 import com.example.tenderservice.repository.TenderRepository;
 import com.example.tenderservice.service.ITenderService;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -62,23 +65,47 @@ public class TenderServiceImpl implements ITenderService {
     }
 
     @Override
+    @Transactional
     public TenderResponseDTO updateTender(Long tenderId, TenderRequestDTO dto) {
+
         Tender tender = tenderRepository.findById(tenderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tender", "id", tenderId.toString()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Tender", "id", tenderId.toString()));
 
-        // MapStruct to update entity but maintains id
-        Tender updated = tenderMapper.toEntity(dto);
-        updated.setId(tender.getId());
-        updated.setStatus(tender.getStatus());
+        // --- Mise à jour simple des champs : car j'ai trouvé un prob de synchronisation ---
+        tender.setTitle(dto.getTitle());
+        tender.setDescription(dto.getDescription());
+        tender.setDeadline(dto.getDeadline());
+        tender.setOrganizationId(dto.getOrganizationId());
+        tender.setOwnerUserId(dto.getOwnerUserId());
 
-        updated.setDocuments(tender.getDocuments()); // keep existing documents
-        if (updated.getCriteria() != null) {
-            updated.getCriteria().forEach(c -> c.setTender(updated));
-        } // re-link criteria to updated tender
 
-        tenderRepository.save(updated);
-        return tenderMapper.toResponseDTO(updated);
+        // --- MISE À JOUR DES CRITÈRES ---
+
+        List<EvaluationCriterion> existing = tender.getCriteria();           // base
+        @NotEmpty(message = "Criteria cannot be empty") List<EvaluationCriterionRequestDTO> incoming = dto.getCriteria();              // new DTO
+
+        for (EvaluationCriterionRequestDTO newC : incoming) {
+
+            EvaluationCriterion old = existing.stream()
+                    .filter(c -> c.getType().equals(newC.getType()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (old != null) {
+                old.setWeight(newC.getWeight());
+            }
+        }
+
+
+        // NOTE : on ne touche pas aux documents ici
+        // ils peuvent être mis à jour dans un endpoint séparé
+
+        Tender saved = tenderRepository.save(tender);
+
+        return tenderMapper.toResponseDTO(saved);
     }
+
 
     @Override
     public boolean deleteTender(Long tenderId) {
