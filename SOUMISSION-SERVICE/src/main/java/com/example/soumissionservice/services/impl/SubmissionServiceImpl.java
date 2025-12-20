@@ -37,9 +37,14 @@ public class SubmissionServiceImpl implements SubmissionService {
         // Vérifie l’existence du supplier
 //        userClient.getUser(req.supplierId());
 
-        // Upload documents
-        String Url = documentClient.upload(req.Document());
+//        Upload documents
+//        String Url = documentClient.upload(req.Document());
 
+//      !!! tu dois stocker l'ID du document et non l'URL
+//      !!! SubmissionService ne devrait pas connaître la structure de l’URL si demain tu changes:  /api/documents/... → tout casse
+//      !!! L’URL est construite : 1) soit par le frontend , 2) soit par l’API Gateway ,3) soit à la volée
+        String documentId = documentClient.upload(req.Document());
+        s.setDocumentId(documentId);
 
         Submission s = new Submission();
         s.setTenderId(req.tenderId());
