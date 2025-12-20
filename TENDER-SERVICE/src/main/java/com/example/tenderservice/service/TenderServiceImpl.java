@@ -6,6 +6,7 @@ import com.example.tenderservice.entity.Tender;
 import com.example.tenderservice.entity.TenderDocumentRef;
 import com.example.tenderservice.entity.enumeration.TenderStatus;
 import com.example.tenderservice.exception.ResourceNotFoundException;
+import com.example.tenderservice.feignclients.DocumentClient;
 import com.example.tenderservice.mapper.TenderMapper;
 import com.example.tenderservice.repository.TenderRepository;
 import com.example.tenderservice.service.ITenderService;
@@ -25,6 +26,7 @@ public class TenderServiceImpl implements ITenderService {
 
     private final TenderRepository tenderRepository;
     private final TenderMapper tenderMapper;
+    private final DocumentClient documentClient;
 
     @Override
     public TenderResponseDTO createTender(TenderRequestDTO dto,List<MultipartFile> files) {
@@ -42,12 +44,15 @@ public class TenderServiceImpl implements ITenderService {
 
             List<TenderDocumentRef> docRefs = files.stream()
                     .map(file -> {
-                        // ICI : vous pouvez enregistrer le fichier dans MinIO / AWS / disque
-                        // puis récupérer l'id ou le chemin obtenu
 
+//                        TenderService n’upload pas de fichiers
+//                        TenderService appelle Document-Service
+//                        TenderService stocke documentId
+//                        L’URL est calculée dans les DTO de réponse, pas en base
+
+                        String documentId = documentClient.upload(file);
                         return TenderDocumentRef.builder()
-                                //.documentId(storedId)          // ID dans le storage
-                                //.url(generatedUrl)             // URL d'accès au document
+                                .documentId(documentId)          // ID dans le storage
                                 .fileName(file.getOriginalFilename())
                                 .contentType(file.getContentType())
                                 .tender(tender)                // relation many-to-one

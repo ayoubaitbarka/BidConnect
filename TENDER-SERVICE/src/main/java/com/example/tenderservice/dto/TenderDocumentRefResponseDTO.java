@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class TenderDocumentRefResponseDTO {
     private Long id;
     private String documentId;
-    private String url;
     private String fileName;
     private String contentType;
+    private String downloadUrl;
 }

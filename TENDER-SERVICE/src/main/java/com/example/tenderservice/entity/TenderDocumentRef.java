@@ -13,7 +13,7 @@ public class TenderDocumentRef {
 
     private String documentId;
 
-    private String url;
+//    private String url;
 
     private String fileName;
 
