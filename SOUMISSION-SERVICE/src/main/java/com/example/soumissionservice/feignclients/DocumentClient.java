@@ -13,5 +13,7 @@ public interface DocumentClient {
 
     @PostMapping(value = "/api/documents/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String upload(@RequestPart("file") MultipartFile file);
+    @DeleteMapping("/api/documents/{id}")
+    void delete(@PathVariable("id") String documentId);
 }
 

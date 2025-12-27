@@ -114,12 +114,26 @@ public class TenderServiceImpl implements ITenderService {
 
     @Override
     public boolean deleteTender(Long tenderId) {
-        if (!tenderRepository.existsById(tenderId))
+
+        Tender tender = tenderRepository.findById(tenderId)
+                .orElse(null);
+
+        if (tender == null)
             return false;
 
-        tenderRepository.deleteById(tenderId);
+        // 🔹 SUPPRESSION DES DOCUMENTS DANS DOCUMENT-SERVICE
+        if (tender.getDocuments() != null) {
+            tender.getDocuments().forEach(doc ->
+                    documentClient.delete(doc.getDocumentId())
+            );
+        }
+
+        // 🔹 SUPPRESSION DU TENDER (et des TenderDocumentRef via JPA)
+        tenderRepository.delete(tender);
+
         return true;
     }
+
 
     @Override
     public TenderResponseDTO getTenderById(Long tenderId) {

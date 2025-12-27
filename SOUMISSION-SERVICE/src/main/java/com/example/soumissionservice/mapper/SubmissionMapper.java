@@ -11,10 +11,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface SubmissionMapper {
 
-    @Mapping(target = "id", source = "id")
+//    @Mapping(target = "id", source = "id")
     SubmissionResponse toResponse(Submission s);
 
-    @Mapping(target = "id", source = "id")
+//    @Mapping(target = "id", source = "id")
     Submission toEntity(SubmissionResponse r);
 
 }

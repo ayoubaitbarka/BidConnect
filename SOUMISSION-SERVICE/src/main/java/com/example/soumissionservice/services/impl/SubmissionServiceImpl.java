@@ -28,46 +28,59 @@ public class SubmissionServiceImpl implements SubmissionService {
 //    private final NotificationClient notificationClient;
     private final SubmissionMapper subMapper;
 
+
+//  Ce que doit faire createSubmission maintenant (logique correcte)
+//  Ordre logique :
+//      vérifier le tender
+//      uploader le document → récupérer documentId
+//      créer la Submission
+//      stocker documentId
+//      sauvegarder
+//      lancer l’analyse IA
+@Override
+public SubmissionResponse createSubmission(SubmissionRequest req) {
+
+    // 1️⃣ Vérifie si l’appel d'offre est ouvert
+    tenderClient.validateTenderOpen(req.tenderId());
+
+    // 2️⃣ Upload document → récupérer l’ID
+    String documentId = documentClient.upload(req.Document());
+
+    // 3️⃣ Créer la submission
+    Submission s = new Submission();
+    s.setTenderId(req.tenderId());
+    s.setSupplierId(req.supplierId());
+    s.setDocumentId(documentId);   // ✅ correct
+    s.setStatus(SubmissionStatus.SUBMITTED);
+    s.setCreatedAt(LocalDateTime.now());
+
+    repo.save(s);
+
+    // 4️⃣ Analyse IA
+    String ragResult = aiClient.analyze(s.getId());
+    s.setRagAnalysis(ragResult);
+
+    repo.save(s);
+
+
+    return subMapper.toResponse(s);
+}
+
     @Override
-    public SubmissionResponse createSubmission(SubmissionRequest req) {
+    public boolean deleteSubmission(String submissionId) {
 
-        // Vérifie si l’appel d'offre est ouvert
-        tenderClient.validateTenderOpen(req.tenderId());
+        Submission s = repo.findById(submissionId).orElse(null);
+        if (s == null) return false;
 
-        // Vérifie l’existence du supplier
-//        userClient.getUser(req.supplierId());
+        // 🔹 Synchronisation Document-Service
+        if (s.getDocumentId() != null) {
+            documentClient.delete(s.getDocumentId());
+        }
 
-//        Upload documents
-//        String Url = documentClient.upload(req.Document());
-
-//      !!! tu dois stocker l'ID du document et non l'URL
-//      !!! SubmissionService ne devrait pas connaître la structure de l’URL si demain tu changes:  /api/documents/... → tout casse
-//      !!! L’URL est construite : 1) soit par le frontend , 2) soit par l’API Gateway ,3) soit à la volée
-        String documentId = documentClient.upload(req.Document());
-        s.setDocumentId(documentId);
-
-        Submission s = new Submission();
-        s.setTenderId(req.tenderId());
-        s.setSupplierId(req.supplierId());
-        s.setDocUrl(Url);
-        s.setStatus(SubmissionStatus.SUBMITTED);
-        s.setCreatedAt(LocalDateTime.now());
-
-        repo.save(s);
-
-        // Analyse IA
-        String ragResult = aiClient.analyze(s.getId());
-        s.setRagAnalysis(ragResult);
-
-        repo.save(s);
-
-        // Notification Owner
-//        notificationClient.notifySubmission(
-//                new NotificationRequest(req.tenderId(), req.supplierId(), "New submission received")
-//        );
-
-        return subMapper.toResponse(s);
+        repo.delete(s);
+        return true;
     }
+
 
     @Override
     public SubmissionResponse findSubmission(String id) {

@@ -11,4 +11,6 @@ public interface SubmissionService {
     SubmissionResponse findSubmission(String id);
     List<SubmissionResponse> getByTender(String tenderId);
     void updateStatus(String id, SubmissionStatus status);
+    boolean deleteSubmission(String submissionId);
+
 }

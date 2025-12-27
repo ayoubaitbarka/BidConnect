@@ -6,6 +6,7 @@ public record SubmissionResponse(
         String id,
         String tenderId,
         String supplierId,
+        String documentId,
         SubmissionStatus status,
         double scoreTotal,
         String ragAnalysis

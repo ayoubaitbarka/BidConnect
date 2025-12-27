@@ -20,7 +20,9 @@ public class Submission {
     private String tenderId;
     private String supplierId;
 
-    private String DocUrl;
+//    private String DocUrl;
+    private String documentId;
+
 
 
     @Enumerated(EnumType.STRING)

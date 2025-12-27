@@ -21,6 +21,12 @@ public class SubmissionController {
         return submissionService.createSubmission(req);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteSubmission(@PathVariable String id) {
+        submissionService.deleteSubmission(id);
+    }
+
+
     @PatchMapping("/{id}/status")
     public void updateStatus(@PathVariable String id,
                              @RequestBody StatusUpdateRequest req) {
