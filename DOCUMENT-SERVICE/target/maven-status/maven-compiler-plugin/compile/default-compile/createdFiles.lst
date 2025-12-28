@@ -1,0 +1,9 @@
+com\example\documentservice\service\DocumentServiceImpl.class
+com\example\documentservice\config\MinioConfig.class
+com\example\documentservice\entity\Document.class
+com\example\documentservice\dto\DocumentResponse.class
+com\example\documentservice\service\DocumentService.class
+com\example\documentservice\repository\DocumentRepository.class
+com\example\documentservice\DocumentServiceApplication.class
+com\example\documentservice\entity\Document$DocumentBuilder.class
+com\example\documentservice\controller\DocumentController.class

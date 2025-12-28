@@ -51,7 +51,6 @@ public class DocumentServiceImpl implements DocumentService {
                     .fileName(file.getOriginalFilename())
                     .contentType(file.getContentType())
                     .objectName(objectName)
-                    .url(url)
                     .uploadedAt(LocalDateTime.now())
                     .build();
 

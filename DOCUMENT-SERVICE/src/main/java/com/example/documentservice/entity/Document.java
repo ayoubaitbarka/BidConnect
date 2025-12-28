@@ -21,6 +21,5 @@ public class Document {
 //  nom réel dans MinIO :
     private String objectName;
 //  url retournée aux autres services :
-    private String url;
     private LocalDateTime uploadedAt;
 }
