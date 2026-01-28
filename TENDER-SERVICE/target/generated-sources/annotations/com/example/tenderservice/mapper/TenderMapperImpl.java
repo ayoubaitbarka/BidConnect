@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-27T20:56:57+0100",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260101-2150, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-01-27T17:44:28+0100",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21 (Oracle Corporation)"
 )
 @Component
 public class TenderMapperImpl implements TenderMapper {
@@ -35,12 +35,12 @@ public class TenderMapperImpl implements TenderMapper {
 
         Tender.TenderBuilder tender = Tender.builder();
 
-        tender.criteria( evaluationCriterionRequestDTOListToEvaluationCriterionList( dto.getCriteria() ) );
-        tender.deadline( dto.getDeadline() );
+        tender.title( dto.getTitle() );
         tender.description( dto.getDescription() );
         tender.organizationId( dto.getOrganizationId() );
         tender.ownerUserId( dto.getOwnerUserId() );
-        tender.title( dto.getTitle() );
+        tender.deadline( dto.getDeadline() );
+        tender.criteria( evaluationCriterionRequestDTOListToEvaluationCriterionList( dto.getCriteria() ) );
 
         return tender.build();
     }
@@ -53,18 +53,18 @@ public class TenderMapperImpl implements TenderMapper {
 
         TenderResponseDTO tenderResponseDTO = new TenderResponseDTO();
 
-        tenderResponseDTO.setCriteria( evaluationCriterionListToEvaluationCriterionResponseDTOList( entity.getCriteria() ) );
-        tenderResponseDTO.setDeadline( entity.getDeadline() );
-        tenderResponseDTO.setDescription( entity.getDescription() );
-        tenderResponseDTO.setDocuments( tenderDocumentRefListToTenderDocumentRefResponseDTOList( entity.getDocuments() ) );
         tenderResponseDTO.setId( entity.getId() );
+        tenderResponseDTO.setTitle( entity.getTitle() );
+        tenderResponseDTO.setDescription( entity.getDescription() );
         tenderResponseDTO.setOrganizationId( entity.getOrganizationId() );
         tenderResponseDTO.setOwnerUserId( entity.getOwnerUserId() );
-        tenderResponseDTO.setPublicationDate( entity.getPublicationDate() );
         if ( entity.getStatus() != null ) {
             tenderResponseDTO.setStatus( entity.getStatus().name() );
         }
-        tenderResponseDTO.setTitle( entity.getTitle() );
+        tenderResponseDTO.setPublicationDate( entity.getPublicationDate() );
+        tenderResponseDTO.setDeadline( entity.getDeadline() );
+        tenderResponseDTO.setCriteria( evaluationCriterionListToEvaluationCriterionResponseDTOList( entity.getCriteria() ) );
+        tenderResponseDTO.setDocuments( tenderDocumentRefListToTenderDocumentRefResponseDTOList( entity.getDocuments() ) );
 
         return tenderResponseDTO;
     }
