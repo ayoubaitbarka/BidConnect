@@ -8,7 +8,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(name = "document-service")
+//@FeignClient(name = "document-service")
+//public interface DocumentClient {
+//
+//    @PostMapping(
+//            value = "/api/documents/upload",
+//            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+//    )
+//    String upload(@RequestPart("file") MultipartFile file);
+//
+//    @DeleteMapping("/api/documents/{id}")
+//    void delete(@PathVariable("id") String documentId);
+//}
+
+@FeignClient(
+        name = "document-service",
+        url = "http://localhost:8081"   // port du document-service
+)
 public interface DocumentClient {
 
     @PostMapping(
@@ -20,3 +36,4 @@ public interface DocumentClient {
     @DeleteMapping("/api/documents/{id}")
     void delete(@PathVariable("id") String documentId);
 }
+

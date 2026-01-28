@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.*;
 @Mapper(componentModel = "spring")
 public interface TenderDocumentRefMapper {
 
-    //  ( ICI l'URL de téléchargement est construite à partir de l'ID du document)
+    TenderDocumentRef toEntity(TenderDocumentRefRequestDTO dto);
+
     @Mapping(
             target = "downloadUrl",
-            expression = "java(\"/api/documents/\" + entity.getDocumentId() + \"/download\")"
+            expression = "java(\"http://localhost:8081/api/documents/\" + entity.getDocumentId() + \"/download\")"
     )
-
-    TenderDocumentRef toEntity(TenderDocumentRefRequestDTO dto);
 
     TenderDocumentRefResponseDTO toResponseDTO(TenderDocumentRef entity);
 }
