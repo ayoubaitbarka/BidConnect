@@ -19,9 +19,14 @@ public class DocumentServiceApplication {
     public CommandLineRunner testMinio(MinioClient minioClient, @Value("${minio.bucket}") String bucket) {
         return args -> {
             boolean exists = minioClient.bucketExists(
-                    io.minio.BucketExistsArgs.builder().bucket(bucket).build()
-            );
-            System.out.println("Le bucket '" + bucket + "' existe ? " + exists);
+                    io.minio.BucketExistsArgs.builder().bucket(bucket).build());
+            if (!exists) {
+                minioClient.makeBucket(
+                        io.minio.MakeBucketArgs.builder().bucket(bucket).build());
+                System.out.println("Bucket '" + bucket + "' créé avec succès.");
+            } else {
+                System.out.println("Le bucket '" + bucket + "' existe déjà.");
+            }
         };
     }
 }
