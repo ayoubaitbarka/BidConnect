@@ -8,7 +8,10 @@ public record SubmissionResponse(
         String supplierId,
         String documentId,
         SubmissionStatus status,
-        double scoreTotal,
+        Double price,
+        Double technical,
+        Double deadline,
+        Double score,
         String ragAnalysis
 ) {}
 

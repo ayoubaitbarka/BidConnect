@@ -1,16 +1,17 @@
 package com.example.soumissionservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+
 @Data
+@Getter
+@Setter
 public class Submission {
 
     @Id
@@ -28,9 +29,9 @@ public class Submission {
     @Enumerated(EnumType.STRING)
     private SubmissionStatus status= SubmissionStatus.SUBMITTED;
 
-    private Double Price;
-    private Double Technical;
-    private Double Deadline;
+    private Double price;
+    private Double technical;
+    private Double deadline;
     private Double score;
 
     @Column(columnDefinition = "TEXT")

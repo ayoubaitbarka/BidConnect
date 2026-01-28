@@ -3,6 +3,7 @@ package com.example.soumissionservice.services;
 import com.example.soumissionservice.dto.SubmissionRequest;
 import com.example.soumissionservice.dto.SubmissionResponse;
 import com.example.soumissionservice.entity.SubmissionStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

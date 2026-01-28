@@ -9,7 +9,6 @@ import com.example.soumissionservice.mapper.SubmissionMapper;
 import com.example.soumissionservice.repository.SubmissionRepository;
 import com.example.soumissionservice.services.SubmissionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,58 +20,60 @@ import java.util.List;
 public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository repo;
-    private final TenderClient tenderClient;
+    // private final TenderClient tenderClient;
     private final DocumentClient documentClient;
-    private final AIClient aiClient;
-//    private final UserClient userClient;
-//    private final NotificationClient notificationClient;
+    // private final AIClient aiClient;
+    // private final UserClient userClient;
+    // private final NotificationClient notificationClient;
     private final SubmissionMapper subMapper;
 
+    // Ce que doit faire createSubmission maintenant (logique correcte)
+    // Ordre logique :
+    // vérifier le tender
+    // uploader le document → récupérer documentId
+    // créer la Submission
+    // stocker documentId
+    // sauvegarder
+    // lancer l’analyse IA
+    @Override
+    public SubmissionResponse createSubmission(SubmissionRequest req) {
 
-//  Ce que doit faire createSubmission maintenant (logique correcte)
-//  Ordre logique :
-//      vérifier le tender
-//      uploader le document → récupérer documentId
-//      créer la Submission
-//      stocker documentId
-//      sauvegarder
-//      lancer l’analyse IA
-@Override
-public SubmissionResponse createSubmission(SubmissionRequest req) {
+        // 1️⃣ Vérifie si l’appel d'offre est ouvert
+        // tenderClient.validateTenderOpen(req.tenderId());
 
-    // 1️⃣ Vérifie si l’appel d'offre est ouvert
-    tenderClient.validateTenderOpen(req.tenderId());
+        // 2️⃣ Upload document → récupérer l’ID
+        String documentId = documentClient.upload(req.document());
 
-    // 2️⃣ Upload document → récupérer l’ID
-    String documentId = documentClient.upload(req.Document());
+        // 3️⃣ Créer la submission
+        Submission s = new Submission();
+        s.setTenderId(req.tenderId());
+        s.setSupplierId(req.supplierId());
+        s.setDocumentId(documentId);
+        s.setPrice(req.price());
+        s.setTechnical(req.technical());
+        s.setDeadline(req.deadline());
+        s.setStatus(SubmissionStatus.SUBMITTED);
+        s.setCreatedAt(LocalDateTime.now());
 
-    // 3️⃣ Créer la submission
-    Submission s = new Submission();
-    s.setTenderId(req.tenderId());
-    s.setSupplierId(req.supplierId());
-    s.setDocumentId(documentId);   // ✅ correct
-    s.setStatus(SubmissionStatus.SUBMITTED);
-    s.setCreatedAt(LocalDateTime.now());
+        repo.save(s);
 
-    repo.save(s);
+        // 4️⃣ Analyse IA
+        // String ragResult = aiClient.analyze(s.getId());
+        // s.setRagAnalysis(ragResult);
+        //
+        // repo.save(s);
 
-    // 4️⃣ Analyse IA
-    String ragResult = aiClient.analyze(s.getId());
-    s.setRagAnalysis(ragResult);
-
-    repo.save(s);
-
-
-    return subMapper.toResponse(s);
-}
+        return subMapper.toResponse(s);
+    }
 
     @Override
     public boolean deleteSubmission(String submissionId) {
 
         Submission s = repo.findById(submissionId).orElse(null);
-        if (s == null) return false;
+        if (s == null)
+            return false;
 
-        // 🔹 Synchronisation Document-Service
+        // 🔹 Synchronisation document-Service
         if (s.getDocumentId() != null) {
             documentClient.delete(s.getDocumentId());
         }
@@ -80,7 +81,6 @@ public SubmissionResponse createSubmission(SubmissionRequest req) {
         repo.delete(s);
         return true;
     }
-
 
     @Override
     public SubmissionResponse findSubmission(String id) {
@@ -97,7 +97,6 @@ public SubmissionResponse createSubmission(SubmissionRequest req) {
         }
         return responses;
     }
-
 
     @Override
     public void updateStatus(String id, SubmissionStatus status) {
