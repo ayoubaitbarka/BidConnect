@@ -30,11 +30,11 @@ springdoc:
 langchain4j:
   open-ai:
     chat-model:
-      api-key: ${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:demo}
+      api-key: ${API-KEY:demo}
       model-name: gpt-4o-mini
       temperature: 0.7
     embedding-model:
-      api-key: ${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:demo}
+      api-key: ${API-KEY:demo}
       model-name: text-embedding-3-small
 
   qdrant:
