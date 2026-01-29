@@ -1,6 +1,8 @@
 # Maven
 target/
 
+
+AI-SERVICE/src/main/resources/application.yml
 # IntelliJ
 .idea/
 *.iml
