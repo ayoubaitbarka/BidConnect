@@ -1,0 +1,43 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: AI-SERVICE
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/ai_db
+    username: ai_user
+    password: ai_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# LangChain4j Configuration
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: ${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:demo}
+      model-name: gpt-4o-mini
+      temperature: 0.7
+    embedding-model:
+      api-key: ${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:demo}
+      model-name: text-embedding-3-small
+
+  qdrant:
+     host: localhost
+     port: 6334  # gRPC port (6333 is HTTP REST API)
+     collection-name: bid_embeddings

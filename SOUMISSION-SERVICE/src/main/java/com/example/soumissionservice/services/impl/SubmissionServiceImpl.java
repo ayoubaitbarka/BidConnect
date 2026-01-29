@@ -2,6 +2,7 @@ package com.example.soumissionservice.services.impl;
 
 import com.example.soumissionservice.dto.SubmissionRequest;
 import com.example.soumissionservice.dto.SubmissionResponse;
+import com.example.soumissionservice.dto.TenderResponse;
 import com.example.soumissionservice.entity.Submission;
 import com.example.soumissionservice.entity.SubmissionStatus;
 import com.example.soumissionservice.feignclients.*;
@@ -20,9 +21,9 @@ import java.util.List;
 public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionRepository repo;
-    // private final TenderClient tenderClient;
+    private final TenderClient tenderClient;
     private final DocumentClient documentClient;
-    // private final AIClient aiClient;
+    private final AIClient aiClient;
     // private final UserClient userClient;
     // private final NotificationClient notificationClient;
     private final SubmissionMapper subMapper;
@@ -39,7 +40,10 @@ public class SubmissionServiceImpl implements SubmissionService {
     public SubmissionResponse createSubmission(SubmissionRequest req) {
 
         // 1️⃣ Vérifie si l’appel d'offre est ouvert
-        // tenderClient.validateTenderOpen(req.tenderId());
+        TenderResponse tender = tenderClient.getTender(req.tenderId());
+        if (!"PUBLISHED".equals(tender.status())) {
+            throw new RuntimeException("Tender is not open for submission");
+        }
 
         // 2️⃣ Upload document → récupérer l’ID
         String documentId = documentClient.upload(req.document());
@@ -58,10 +62,10 @@ public class SubmissionServiceImpl implements SubmissionService {
         repo.save(s);
 
         // 4️⃣ Analyse IA
-        // String ragResult = aiClient.analyze(s.getId());
-        // s.setRagAnalysis(ragResult);
-        //
-        // repo.save(s);
+        String ragResult = aiClient.analyze(s.getId());
+        s.setRagAnalysis(ragResult);
+
+        repo.save(s);
 
         return subMapper.toResponse(s);
     }
